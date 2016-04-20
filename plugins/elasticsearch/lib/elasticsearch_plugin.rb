@@ -12,6 +12,9 @@ class ElasticsearchPlugin < Noosfero::Plugin
 
   Noosfero::Application.class_eval do
     config.after_initialize do
+
+      Rails.application.eager_load! #TODO: REMOVE THIS LINE
+
       models = ActiveRecord::Base.descendants.select do |model|
         model.const_defined?("SEARCHABLE_FIELDS")
       end
