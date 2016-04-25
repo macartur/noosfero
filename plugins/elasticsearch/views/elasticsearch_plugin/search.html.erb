@@ -2,17 +2,17 @@
 
 <%= form_tag controller: "elasticsearch_plugin", action: "search" do %>
     <%= label_tag(:q, _("Search")) %>
-    <%= text_field_tag(:q) %>
+    <%= text_field_tag(:q, @query) %>
 
     <%= submit_tag _("Send") %>
 
-    <%= check_box_tag 'communities', 1, @checkbox[:communities] %>
+    <%= check_box_tag 'model[communities]', 1, @checkbox[:communities] %>
     <%= label_tag('communities', _("communities")) %>
 
-    <%= check_box_tag 'people', 1, @checkbox[:people] %>
+    <%= check_box_tag 'model[people]', 1, @checkbox[:people] %>
     <%= label_tag('people', _("people")) %>
 
-    <%= check_box_tag 'articles', 1, @checkbox[:articles] %>
+    <%= check_box_tag 'model[articles]', 1, @checkbox[:articles] %>
     <%= label_tag('articles', _("articles")) %>
 
 <% end %>
