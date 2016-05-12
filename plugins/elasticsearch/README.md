@@ -15,6 +15,9 @@ Install dependencies
 Install elasticsearch package and start service.
 By default, the service runs on port 9200
 
+Install gems listed in plugin Gemfile. If this step fail, just copy the gems to core Gemfile
+and run the command 'bundle install'
+
 Enable plugin
 -------------
 
@@ -35,4 +38,4 @@ DEVELOPMENT
 
 To run  tests for Elasticsearch:
 
-Use rspec command
+Use command 'rspec'
