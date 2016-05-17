@@ -37,9 +37,13 @@ class ElasticsearchPluginController < ApplicationController
            query: {
                multi_match: {
                    query: text,
-                   fields: fields
+                   fields: fields,
+                   operator: "and"
                }
-           }
+             },
+             filter: {
+               term: {visible: "true"}
+             }
        }
     end
     query
