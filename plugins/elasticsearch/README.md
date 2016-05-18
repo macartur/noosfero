@@ -10,7 +10,7 @@ Download: https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-5
 INSTALL
 =======
 
-Install elasticsearch.
+Install elasticsearch and openjdk-7-jdk.
 
     $ cd plugins/elasticsearch
     $ rake install

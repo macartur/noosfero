@@ -13,5 +13,6 @@ end
 
 desc "install elasticsearch"
 task :install => :download do
+  sh 'sudo apt-get install openjdk-7-jdk'
   sh 'sudo dpkg -i /tmp/elasticsearch.deb || sudo apt-get install -f'
 end
