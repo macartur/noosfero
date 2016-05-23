@@ -1,9 +1,8 @@
 require_dependency 'comment'
+require_relative '../elasticsearch_indexed_model'
 
 class Comment
   def self.control_fields
-      %w()
+    %w()
   end
-
-  require_relative '../elasticsearch_helper'
 end
