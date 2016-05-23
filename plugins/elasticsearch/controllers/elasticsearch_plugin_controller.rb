@@ -1,6 +1,11 @@
 class ElasticsearchPluginController < ApplicationController
   no_design_blocks
 
+  def index
+    search()
+    render :action => 'search'
+  end
+
   def search
     @results = []
     @query = params[:q]
