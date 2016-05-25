@@ -28,7 +28,13 @@ class ElasticsearchPluginController < ApplicationController
     query = {}
     unless text.blank?
 
-       fields = klass::SEARCHABLE_FIELDS.map {|k, v|  "#{k}^#{v[:weight]}"}
+       fields = klass.indexable_fields.map do |key, value|
+         if value[:weight]
+           "#{k}^#{v[:weight]}"
+         else
+           "#{k}"
+         end
+       end
 
        query = {
            query: {
