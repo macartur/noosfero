@@ -10,9 +10,4 @@ class Article
       :published,
     ]
   end
-
-  def self.indexable_fields
-    SEARCHABLE_FIELDS.keys + self.control_fields 
-  end
-
 end

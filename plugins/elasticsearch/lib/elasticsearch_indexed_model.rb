@@ -7,6 +7,7 @@ module ElasticsearchIndexedModel
         mappings dynamic: 'false' do
           base::SEARCHABLE_FIELDS.each do |field, value|
             indexes field
+            print '.'
           end
         end
         base.__elasticsearch__.client.indices.delete \
@@ -19,7 +20,14 @@ module ElasticsearchIndexedModel
           }
       end
     end
+    base.extend ClassMethods
     base.send :import
+  end
+
+  module ClassMethods
+    def indexable_fields
+      self::SEARCHABLE_FIELDS.keys + self.control_fields
+    end
   end
 
 end

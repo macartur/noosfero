@@ -2,7 +2,12 @@ require_dependency 'scrap'
 require_relative '../elasticsearch_indexed_model'
 
 class Scrap
+  include ElasticsearchIndexedModel
+
   def self.control_fields
-    %w(advertise published)
+    [
+      :advertise,
+      :published,
+    ]
   end
 end
