@@ -13,14 +13,10 @@ class ElasticsearchPluginController < ApplicationController
 
     if params[:model].present?
       params[:model].keys.each do |model|
-        model = model.singularize
         @checkbox[model.to_sym] = true
         klass = model.classify.constantize
         query = get_query params[:q], klass
-
         @results |= klass.__elasticsearch__.search(query).records.to_a
-        puts "="*80
-        puts @results.inspect
       end
     end
 
@@ -31,7 +27,6 @@ class ElasticsearchPluginController < ApplicationController
   def get_query text, klass
     query = {}
     unless text.blank?
-    puts "="*80
 
        fields = klass::SEARCHABLE_FIELDS.map do |key, value|
          if value[:weight]
@@ -43,17 +38,17 @@ class ElasticsearchPluginController < ApplicationController
 
        query = {
            query: {
-               regexp: {
-                   name: {
-                     value: "*" + text + "*"
-
-                   }
-                 }
+              match_all: {
                }
+             },
+             filter: {
+               regexp: {
+                  name: {
+                    value: ".*" + text + ".*" }
+             }
+           }
        }
     end
-    puts "="*80
-    puts query.inspect
     query
   end
 
