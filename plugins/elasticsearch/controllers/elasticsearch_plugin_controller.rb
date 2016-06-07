@@ -1,7 +1,12 @@
 class ElasticsearchPluginController < ApplicationController
   no_design_blocks
 
-  SEARCHABLE_MODELS = {communities: true, articles: true, people: true}
+  SEARCHABLE_TYPES = { :all       => { label: "All Results" },
+                       :community => { label: "Communities"},
+                       :article   => { label: "Articles"},
+                       :event     => { label: "Events"},
+                       :person    => { label: "People"}
+                      }
 
   def index
     search()
@@ -9,23 +14,20 @@ class ElasticsearchPluginController < ApplicationController
   end
 
   def search
-    @results = []
+    @searchable_types = SEARCHABLE_TYPES
+    @selected_type = selected_type params
+
     @query = params[:q]
-    @checkbox = {}
+    @results = []
 
-    if params[:model].present?
-        params[:model].keys.each do |model|
-        @checkbox[model.to_sym] = true
-        results model
-      end
-    else
-      unless params[:q].blank?
-        SEARCHABLE_MODELS.keys.each do |model|
-          results model
-        end
-      end
-    end
+#    results 'article'
+#    results 'people'
+     results "community"
+  end
 
+  def selected_type params
+    return :all if params[:selected_type].nil?
+    params[:selected_type]
   end
 
   private
@@ -68,22 +70,10 @@ class ElasticsearchPluginController < ApplicationController
     query
   end
 
-  def get_terms params
-    terms = {}
-    return terms unless params[:filter].present?
-    params[:filter].keys.each do |model|
-      terms[model] = {}
-      params[:filter][model].keys.each do |filter|
-        @checkbox[filter.to_sym] = true
-        terms[model][params[:filter][model.to_sym][filter]] = filter
-      end
-    end
-    terms
-  end
-
   def results model
     klass = model.to_s.classify.constantize
     query = get_query params[:q], klass
+    query = {}
     @results |= klass.__elasticsearch__.search(query).records.to_a
   end
 

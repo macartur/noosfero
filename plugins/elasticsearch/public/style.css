@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+}
+.sidebar {
+  width: 150px;
+}
+
+.search_form {
+  flex: 1;
+}
+
+
