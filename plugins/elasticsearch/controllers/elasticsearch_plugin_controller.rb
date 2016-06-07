@@ -1,12 +1,16 @@
 class ElasticsearchPluginController < ApplicationController
   no_design_blocks
 
-  SEARCHABLE_TYPES = { :all       => { label: "All Results" },
-                       :community => { label: "Communities"},
-                       :article   => { label: "Articles"},
-                       :event     => { label: "Events"},
-                       :person    => { label: "People"}
+  SEARCHABLE_TYPES = { :all       => { label: _("All Results")},
+                       :community => { label: _("Communities")},
+                       :article   => { label: _("Articles")},
+                       :event     => { label: _("Events")},
+                       :person    => { label: _("People")}
                       }
+  SEARCH_FILTERS = { :lexical => { label: _("Alphabetical Order")},
+                     :recent => { label: _("More Recent Order")},
+                     :access => { label: _("More accessed")}
+                   }
 
   def index
     search()
@@ -16,6 +20,7 @@ class ElasticsearchPluginController < ApplicationController
   def search
     @searchable_types = SEARCHABLE_TYPES
     @selected_type = selected_type params
+    @search_filter_types = SEARCH_FILTERS
 
     @query = params[:q]
     @results = []

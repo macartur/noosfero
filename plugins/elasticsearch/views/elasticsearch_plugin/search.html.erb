@@ -3,16 +3,25 @@
   <div class="sidebar">
     <%= @results.count %>
     <ul>
+      <li class="select-search-type active"><a href="#"> <%= @searchable_types.values[0][:label] %></a></li>
       <% for type in @searchable_types.values %>
-        <li><a class=""> <%= type[:label] %></a></li>
+        <li class="select-search-type"><a href="#"> <%= type[:label] %></a></li>
       <% end %>
     </ul>
+
+    <div class="search-filter">
+      <h3><%= _("Filter by") %></h3>
+      <ul>
+        <% for type in @search_filter_types.values %>
+          <li><a href="#"><%= type[:label] %></a></li>
+        <% end %>
+      </ul>
+    </div>
   </div>
 
   <div class="search_form">
       <div class="search_field">
         <%= form_tag controller: "elasticsearch_plugin", action: "search" do %>
-            <%= label_tag(:q, _("Search")) %>
             <%= text_field_tag(:q, @query) %>
 
             <%= submit_tag _("Send") %>

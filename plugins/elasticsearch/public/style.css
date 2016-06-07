@@ -9,4 +9,31 @@
   flex: 1;
 }
 
+.controller-elasticsearch_plugin ul {
+  list-style: none;
+  list-style-position: inside;
+  padding-left: 0px;
+}
 
+.controller-elasticsearch_plugin .select-search-type {
+  padding: 10px;
+  margin: 10px;
+  font-weight: 900;
+  font-family: arial;
+  border: 1px solid #ddd;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.controller-elasticsearch_plugin .select-search-type.active {
+  padding: 10px;
+  background: #ccc;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-weight: 900;
+  font-family: arial;
+}
+
+.controller-elasticsearch_plugin .select-search-type a {
+  text-decoration: none;
+  color: black;
+}
