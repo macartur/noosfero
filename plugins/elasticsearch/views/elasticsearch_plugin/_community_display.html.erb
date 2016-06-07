@@ -1,6 +1,7 @@
-<div class="community-model">
-  <h3><%= community.name %></h3>
-  <div class="description">
-     SAMPLE DESCRIPTION
-  </div>
+<div class="community-header">
+  <%= community.created_at.strftime("%d %B %Y at %H:%M") %> - Eduardo Santos <span class="model-label">COMUNIDADE</span>
+</div>
+<div class="body">
+  <h2><%= community.name %></h2>
+  <p><%= community.description %></p>
 </div>

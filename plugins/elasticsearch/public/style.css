@@ -37,3 +37,15 @@
   text-decoration: none;
   color: black;
 }
+
+.controller-elasticsearch_plugin .community-header .model-label {
+  background: #ddd;
+  color: black;
+  font-weight: 900;
+  padding: 3px;
+}
+
+.controller-elasticsearch_plugin .search-item {
+  margin-bottom: 25px;
+  margin-top: 25px;
+}

@@ -34,7 +34,9 @@
           <% next if klass.to_s.include? "all" %>
 
           <% if result.is_a? klass.to_s.classify.constantize %>
-            <%= render partial: "#{klass}_display", :locals => { klass => result} %>
+            <div class="search-item">
+              <%= render partial: "#{klass}_display", :locals => { klass => result} %>
+            </div>
             <% break %>
           <% end %>
 
