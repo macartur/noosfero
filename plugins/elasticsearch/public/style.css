@@ -38,6 +38,7 @@
   color: black;
 }
 
+.controller-elasticsearch_plugin .search-item .right-side .model-label,
 .controller-elasticsearch_plugin .community-header .model-label {
   background: #ddd;
   color: black;
@@ -48,4 +49,14 @@
 .controller-elasticsearch_plugin .search-item {
   margin-bottom: 25px;
   margin-top: 25px;
+  display: flex;
+}
+
+.controller-elasticsearch_plugin .right-side {
+  flex: 2;
+}
+
+.controller-elasticsearch_plugin .left-side {
+  margin-left: 25px;
+  width: 100px;
 }

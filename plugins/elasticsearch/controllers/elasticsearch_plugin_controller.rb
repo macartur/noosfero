@@ -26,8 +26,8 @@ class ElasticsearchPluginController < ApplicationController
     @results = []
 
 #    results 'article'
-#    results 'people'
-     results "community"
+   results 'people'
+     # results "community"
   end
 
   def selected_type params
