@@ -3,14 +3,14 @@ class ElasticsearchPluginController < ApplicationController
 
   SEARCHABLE_TYPES = { :all       => { label: _("All Results")},
                        :community => { label: _("Communities")},
-                       :article   => { label: _("Articles")},
                        :event     => { label: _("Events")},
                        :person    => { label: _("People")}
-                      }
-  SEARCH_FILTERS = { :lexical => { label: _("Alphabetical Order")},
-                     :recent => { label: _("More Recent Order")},
-                     :access => { label: _("More accessed")}
-                   }
+                     }
+
+  SEARCH_FILTERS   = { :lexical => { label: _("Alphabetical Order")},
+                       :recent => { label: _("More Recent Order")},
+                       :access => { label: _("More accessed")}
+                     }
 
   def index
     search()
@@ -18,22 +18,21 @@ class ElasticsearchPluginController < ApplicationController
   end
 
   def search
-    @searchable_types = SEARCHABLE_TYPES
-    @selected_type = selected_type params
-    @search_filter_types = SEARCH_FILTERS
+    define_searchable_types
+    define_search_fields_types
 
     @query = params[:q]
     @results = []
 
-#    results 'article'
-   results 'people'
-     # results "community"
+    if @selected_type == :all
+      SEARCHABLE_TYPES.keys.each do |type|
+         results type.to_s
+      end
+    else
+      results @selected_type
+    end
   end
 
-  def selected_type params
-    return :all if params[:selected_type].nil?
-    params[:selected_type]
-  end
 
   private
 
@@ -76,10 +75,23 @@ class ElasticsearchPluginController < ApplicationController
   end
 
   def results model
-    klass = model.to_s.classify.constantize
+    begin
+      klass = model.to_s.classify.constantize
+    rescue
+      return
+    end
     query = get_query params[:q], klass
-    query = {}
     @results |= klass.__elasticsearch__.search(query).records.to_a
+  end
+
+  def define_searchable_types
+    @searchable_types = SEARCHABLE_TYPES
+    @selected_type = params[:selected_type].nil? ? :all : params[:selected_type].to_sym
+  end
+
+  def define_search_fields_types
+    @search_filter_types = SEARCH_FILTERS
+    @selected_filter_field = params[:selected_filter_field].nil? ? SEARCH_FILTERS.keys.first : params[:selected_filter_field].to_sym
   end
 
 end

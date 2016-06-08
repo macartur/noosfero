@@ -1,11 +1,14 @@
 <div class="wrapper">
 
   <div class="sidebar">
-    <%= @results.count %>
+    <div class="results-count">
+      <%= @results.count %> <%= _(" results by") %> :
+    </div>
     <ul>
-      <li class="select-search-type active"><a href="#"> <%= @searchable_types.values[0][:label] %></a></li>
-      <% for type in @searchable_types.values %>
-        <li class="select-search-type"><a href="#"> <%= type[:label] %></a></li>
+      <% for type,value in @searchable_types %>
+        <li class="select-search-type <%= "active" if type == @selected_type %>">
+          <%= link_to  value[:label], "?selected_type=#{type}&q=#{@query}&selected_filter_field=#{@selected_filter_field}"%>
+        </li>
       <% end %>
     </ul>
 
@@ -23,7 +26,8 @@
       <div class="search_field">
         <%= form_tag controller: "elasticsearch_plugin", action: "search" do %>
             <%= text_field_tag(:q, @query) %>
-
+            <%= hidden_field_tag 'selected_type', @selected_type %>
+            <%= hidden_field_tag  'selected_filter_field', @selected_filter_field %>
             <%= submit_tag _("Send") %>
         <% end %>
       </div>
@@ -32,17 +36,14 @@
       <% for result in @results %>
         <% for klass in @searchable_types.keys %>
           <% next if klass.to_s.include? "all" %>
-
           <% if result.is_a? klass.to_s.classify.constantize %>
             <div class="search-item">
               <%= render partial: "#{klass}_display", :locals => { klass => result} %>
             </div>
             <% break %>
           <% end %>
-
         <% end %>
       <% end %>
     </div>
   </div>
-
 </div>
