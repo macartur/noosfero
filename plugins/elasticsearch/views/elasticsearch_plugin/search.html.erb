@@ -2,7 +2,7 @@
 
   <div class="sidebar">
     <div class="results-count">
-      <%= @results.count %> <%= _(" results by") %> :
+      <%= @results.total %> <%= _(" results by") %> :
     </div>
     <ul>
       <% for type,value in @searchable_types %>
@@ -24,16 +24,16 @@
 
   <div class="search_form">
       <div class="search_field">
-        <%= form_tag controller: "elasticsearch_plugin", action: "search" do %>
-            <%= text_field_tag(:q, @query) %>
-            <%= hidden_field_tag 'selected_type', @selected_type %>
-            <%= hidden_field_tag  'selected_filter_field', @selected_filter_field %>
+        <%= form_tag '/plugin/elasticsearch/search', method: :get  do %>
+            <%= hidden_field_tag  "selected_type", @selected_type %>
+            <%= hidden_field_tag  "selected_filter_field", @selected_filter_field  %>
+            <%= text_field_tag :q, @query %>
             <%= submit_tag _("Send") %>
         <% end %>
       </div>
 
     <div class="results">
-      <% for result in @results %>
+      <% for result in @results.to_a %>
         <% for klass in @searchable_types.keys %>
           <% next if klass.to_s.include? "all" %>
           <% if result.is_a? klass.to_s.classify.constantize %>
@@ -44,6 +44,9 @@
           <% end %>
         <% end %>
       <% end %>
+      <div class="search_paginate">
+        <%= pagination_links @results %>
+      </div>
     </div>
   </div>
 </div>

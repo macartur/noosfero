@@ -21,33 +21,34 @@ class ElasticsearchPluginController < ApplicationController
     define_searchable_types
     define_search_fields_types
 
+    process_results
+  end
+
+  def process_results
     @query = params[:q]
-    @results = []
 
     if @selected_type == :all
-      SEARCHABLE_TYPES.keys.each do |type|
-         results type.to_s
-      end
+      @results = search_from_all_models
     else
-      results @selected_type
+      @results = search_from_model @selected_type
     end
   end
 
-
   private
 
-  def get_query text, klass
+  def fields_from_model
+    klass::SEARCHABLE_FIELDS.map do |key, value|
+      if value[:weight]
+        "#{key}^#{value[:weight]}"
+      else
+        "#{key}"
+      end
+    end
+  end
+
+  def get_query text, klass=nil
     query = {}
     unless text.blank?
-       text = text.downcase
-       fields = klass::SEARCHABLE_FIELDS.map do |key, value|
-         if value[:weight]
-           "#{key}^#{value[:weight]}"
-         else
-           "#{key}"
-         end
-       end
-
        query = {
          query: {
            match_all: {
@@ -74,14 +75,23 @@ class ElasticsearchPluginController < ApplicationController
     query
   end
 
-  def results model
+
+  def search_from_all_models
+    models = []
+    query = get_query params[:q]
+
+    SEARCHABLE_TYPES.keys.each {| model | models.append( model.to_s.classify.constantize) if model != :all }
+    Elasticsearch::Model.search(query, models, size: default_per_page).page(params[:page]).records
+  end
+
+  def search_from_model model
     begin
       klass = model.to_s.classify.constantize
+      query = get_query params[:q], klass
+      klass.search(query, size: default_per_page).page(params[:page]).records
     rescue
-      return
+      []
     end
-    query = get_query params[:q], klass
-    @results |= klass.__elasticsearch__.search(query).records.to_a
   end
 
   def define_searchable_types
@@ -92,6 +102,10 @@ class ElasticsearchPluginController < ApplicationController
   def define_search_fields_types
     @search_filter_types = SEARCH_FILTERS
     @selected_filter_field = params[:selected_filter_field].nil? ? SEARCH_FILTERS.keys.first : params[:selected_filter_field].to_sym
+  end
+
+  def default_per_page
+    10
   end
 
 end
