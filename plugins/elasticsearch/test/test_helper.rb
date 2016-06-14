@@ -1,1 +1,29 @@
 require 'test_helper'
+
+class ElasticsearchTestHelper < ActionController::TestCase
+
+  def setup
+    setup_environment
+    import_instancies
+  end
+
+  def teardown
+    indexed_models.each {|model|
+      model.__elasticsearch__.client.indices.delete index: model.index_name
+    }
+  end
+
+  def import_instancies
+    indexed_models.each {|model|
+      model.__elasticsearch__.create_index!
+      model.import
+    }
+    sleep 2
+  end
+
+  def setup_environment
+    @environment = Environment.default
+    @environment.enable_plugin(ElasticsearchPlugin)
+  end
+
+end
