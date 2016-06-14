@@ -1,10 +1,14 @@
 require "#{File.dirname(__FILE__)}/../../test_helper"
 
-class EventTest < ActiveSupport::TestCase
+class EventTest < ElasticsearchTestHelper
+
+  def indexed_models
+    [Event]
+  end
+
   def setup
-    @environment = Environment.default
-    @environment.enable_plugin(ElasticsearchPlugin)
     @profile = create_user('testing').person
+    super
   end
 
   should 'index custom fields for Event model' do

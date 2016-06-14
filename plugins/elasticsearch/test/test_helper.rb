@@ -26,4 +26,8 @@ class ElasticsearchTestHelper < ActionController::TestCase
     @environment.enable_plugin(ElasticsearchPlugin)
   end
 
+  def indexed_models
+    []
+  end
+
 end
