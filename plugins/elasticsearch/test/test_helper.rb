@@ -30,4 +30,8 @@ class ElasticsearchTestHelper < ActionController::TestCase
     []
   end
 
+  def indexed_fields model
+    model.mappings.to_hash[model.name.downcase.to_sym][:properties]
+  end
+
 end
