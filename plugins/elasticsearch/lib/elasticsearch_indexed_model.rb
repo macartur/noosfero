@@ -9,7 +9,10 @@ module ElasticsearchIndexedModel
         mappings dynamic: 'false' do
           base.indexable_fields.each do |field, value|
             value = {} if value.nil?
-            indexes field, type: value[:type].presence
+            indexes field, type: value[:type].presence, fields: {"raw" =>
+                                                                 {"index" => "not_analyzed",
+                                                                  "type" => "String"
+                                                                 }  }
             print '.'
           end
         end
@@ -29,7 +32,7 @@ module ElasticsearchIndexedModel
 
   module ClassMethods
     def indexable_fields
-      self::SEARCHABLE_FIELDS.update self.control_fields
+      self::SEARCHABLE_FIELDS.merge self.control_fields
     end
   end
 

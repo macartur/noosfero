@@ -19,44 +19,18 @@ module ElasticsearchHelper
     }
   end
 
-  def fields_from_model
-    klass::SEARCHABLE_FIELDS.map do |key, value|
-      if value[:weight]
-        "#{key}^#{value[:weight]}"
-      else
-        "#{key}"
+  def fields_from_models klasses
+    fields = Set.new
+    klasses.each do |klass|
+      klass::SEARCHABLE_FIELDS.map do |key, value|
+        if value and value[:weight]
+          fields.add "#{key}^#{value[:weight]}"
+        else
+          fields.add "#{key}"
+        end
       end
     end
-  end
-
-  def get_query text, klass=nil
-    query = {}
-    unless text.blank?
-       text = text.downcase
-       query = {
-         query: {
-           match_all: {
-           }
-         },
-         filter: {
-           regexp: {
-             name: {
-               value: ".*" + text + ".*" }
-           }
-         },
-         suggest: {
-           autocomplete: {
-             text: text,
-             term: {
-               field: "name",
-               suggest_mode: "always"
-             }
-           }
-         }
-
-       }
-    end
-    query
+    fields.to_a
   end
 
   def process_results
@@ -69,10 +43,8 @@ module ElasticsearchHelper
   end
 
   def search_from_all_models
-    models = []
     query = get_query params[:query]
-
-    ElasticsearchHelper::searchable_types.keys.each {| model | models.append( model.to_s.classify.constantize) if model != :all }
+    models = searchable_models
     Elasticsearch::Model.search(query, models, size: default_per_page(params[:per_page])).page(params[:page]).records
   end
 
@@ -88,6 +60,43 @@ module ElasticsearchHelper
 
   def default_per_page per_page
     per_page ||= 10
+  end
+
+  private
+  
+  def get_query text, klass=nil
+    fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
+    query = {}
+    unless text.blank?
+      text = text.downcase
+      query = {
+        query: {
+          multi_match: {
+            query: text,
+            type: "phrase",
+            fields: fields,
+            zero_terms_query: "none"
+          },
+        },
+        sort: [
+          {"name.raw" => {"order" => "asc"}}
+        ],
+        suggest: {
+          autocomplete: {
+            text: text,
+            term: {
+              field: "name",
+              suggest_mode: "always"
+            }
+          }
+        }
+      }
+    end
+    query
+  end
+
+  def searchable_models
+    SEARCHABLE_TYPES.except(:all).keys.map { | model | model.to_s.classify.constantize }
   end
 
 end
