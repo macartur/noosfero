@@ -64,39 +64,47 @@ module ElasticsearchHelper
 
   private
   
-  def get_query text, klass=nil
-    fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
-    query = {}
-    unless text.blank?
-      text = text.downcase
-      query = {
-        query: {
-          multi_match: {
-            query: text,
-            type: "phrase",
-            fields: fields,
-            zero_terms_query: "none"
-          },
-        },
-        sort: [
-          {"name.raw" => {"order" => "asc"}}
-        ],
-        suggest: {
-          autocomplete: {
-            text: text,
-            term: {
-              field: "name",
-              suggest_mode: "always"
-            }
-          }
+  def searchable_models
+    SEARCHABLE_TYPES.except(:all).keys.map { | model | model.to_s.classify.constantize }
+  end
+
+  def query_method expression, fields
+    query_exp = {}
+    if expression.blank?
+      query_exp = {
+        match_all: {}
+      }
+    else
+      query_exp = {
+        multi_match: {
+          query: expression,
+          type: "phrase",
+          fields: fields,
+          zero_terms_query: "none"
         }
       }
     end
-    query
+    query_exp
   end
 
-  def searchable_models
-    SEARCHABLE_TYPES.except(:all).keys.map { | model | model.to_s.classify.constantize }
+  def get_query text="", klass=nil
+    fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
+    query = {
+      query: query_method(text, fields),
+      sort: [
+        {"name.raw" => {"order" => "asc"}}
+    ],
+    suggest: {
+      autocomplete: {
+        text: text,
+        term: {
+        field: "name",
+        suggest_mode: "always"
+      }
+      }
+    }
+    }
+    query
   end
 
 end
