@@ -5,7 +5,7 @@ class TextArticle
   def self.control_fields
     {
       :advertise => {},
-      :published => {},
+      :published => {}
     }
   end
   include ElasticsearchIndexedModel

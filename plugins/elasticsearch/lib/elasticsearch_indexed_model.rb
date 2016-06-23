@@ -7,12 +7,17 @@ module ElasticsearchIndexedModel
     base.class_eval do
       settings index: { number_of_shards: 1 } do
         mappings dynamic: 'false' do
+          puts "="*10
+          puts base.inspect
+          puts base.indexable_fields
           base.indexable_fields.each do |field, value|
             value = {} if value.nil?
-            indexes field, type: value[:type].presence, fields: {"raw" =>
-                                                                 {"index" => "not_analyzed",
-                                                                  "type" => "String"
-                                                                 }  }
+            if field.to_s == "name"
+              indexes "name.raw", type: "string", index: "not_analyzed"
+              indexes "name", type: "string"
+            else
+            indexes field, type: value[:type].presence
+            end
             print '.'
           end
         end

@@ -92,19 +92,20 @@ module ElasticsearchHelper
     query = {
       query: query_method(text, fields),
       sort: [
-        {"name.raw" => {"order" => "asc"}}
-    ],
-    suggest: {
-      autocomplete: {
-        text: text,
-        term: {
-        field: "name",
-        suggest_mode: "always"
+        {"name.raw" => {"order" => "desc"}}, "_score"
+      ],
+      suggest: {
+        autocomplete: {
+          text: text,
+          term: {
+            field: "name",
+            suggest_mode: "always"
+          }
+        }
       }
-      }
-    }
     }
     query
   end
+
 
 end
