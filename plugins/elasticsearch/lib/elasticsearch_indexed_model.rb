@@ -13,10 +13,14 @@ module ElasticsearchIndexedModel
           base.indexable_fields.each do |field, value|
             value = {} if value.nil?
             if field.to_s == "name"
-              indexes "name.raw", type: "string", index: "not_analyzed"
-              indexes "name", type: "string"
+              indexes "name", type: "string", fields: {
+                raw: {
+                  type: "string",
+                  index: "not_analyzed"
+                }
+              }
             else
-            indexes field, type: value[:type].presence
+              indexes field, type: value[:type].presence
             end
             print '.'
           end

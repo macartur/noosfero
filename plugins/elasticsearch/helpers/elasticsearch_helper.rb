@@ -78,9 +78,9 @@ module ElasticsearchHelper
       query_exp = {
         multi_match: {
           query: expression,
-          type: "phrase",
           fields: fields,
-          zero_terms_query: "none"
+          tie_breaker: 0.4,
+          minimum_should_match: "40%"
         }
       }
     end
@@ -91,21 +91,9 @@ module ElasticsearchHelper
     fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
     query = {
       query: query_method(text, fields),
-      sort: [
-        {"name.raw" => {"order" => "desc"}}, "_score"
-      ],
-      suggest: {
-        autocomplete: {
-          text: text,
-          term: {
-            field: "name",
-            suggest_mode: "always"
-          }
-        }
-      }
+      sort: "name.raw"
     }
     query
   end
-
 
 end
