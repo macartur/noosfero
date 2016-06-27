@@ -6,12 +6,6 @@ class Event
     {
       :advertise => {},
       :published => {},
-      :name => {type: "string", analyzer: "english", fields: {
-      raw:{
-        type: "string",
-        index: "not_analyzed"
-      }
-    }}
     }
   end
   include ElasticsearchIndexedModel

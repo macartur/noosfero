@@ -6,12 +6,7 @@ class Person
     {
       :visible => {type: 'boolean'},
       :public_profile => {type: 'boolean'},
-      :name => {type: "string", fields: {
-      raw:{
-        type: "string",
-        index: "not_analyzed"
-      }
-    }}}
+    }
   end
   include ElasticsearchIndexedModel
 end

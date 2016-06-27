@@ -65,7 +65,7 @@ module ElasticsearchHelper
   private
   
   def searchable_models
-    SEARCHABLE_TYPES.except(:all).keys.map { | model | model.to_s.classify.constantize }
+    ElasticsearchHelper::searchable_types.except(:all).keys.map { | model | model.to_s.classify.constantize }
   end
 
   def query_method expression, fields
@@ -77,7 +77,7 @@ module ElasticsearchHelper
     else
       query_exp = {
         multi_match: {
-          query: expression,
+          query: expression.downcase,
           fields: fields,
           tie_breaker: 0.4,
           minimum_should_match: "40%"

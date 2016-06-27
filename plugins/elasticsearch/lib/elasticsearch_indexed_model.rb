@@ -7,20 +7,13 @@ module ElasticsearchIndexedModel
     base.class_eval do
       settings index: { number_of_shards: 1 } do
         mappings dynamic: 'false' do
-          puts "="*10
-          puts base.inspect
-          puts base.indexable_fields
-          base.indexable_fields.each do |field, value|
+          base.indexed_fields.each do |field, value|
             value = {} if value.nil?
-            if field.to_s == "name"
-              indexes "name", type: "string", fields: {
-                raw: {
-                  type: "string",
-                  index: "not_analyzed"
-                }
-              }
+            type =  value[:type].presence
+            if type.nil?
+              indexes(field, fields: base.raw_field(field))
             else
-              indexes field, type: value[:type].presence
+              indexes field, type: type
             end
             print '.'
           end
@@ -40,9 +33,19 @@ module ElasticsearchIndexedModel
   end
 
   module ClassMethods
-    def indexable_fields
+    def raw_field name
+      {
+        raw: {
+          type: "string",
+          index: "not_analyzed"
+        }
+      }
+    end
+
+    def indexed_fields
       self::SEARCHABLE_FIELDS.merge self.control_fields
     end
+
   end
 
 end
