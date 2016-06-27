@@ -13,9 +13,9 @@ module ElasticsearchHelper
 
   def self.search_filters
     {
-     :lexical => { label: _("Alphabetical Order")},
-     :recent => { label: _("More Recent Order")},
-     :access => { label: _("More accessed")}
+     :relevance => { label: _("Relevance")},
+     :lexical   => { label: _("Alphabetical")},
+     :recent    => { label: _("More Recent")},
     }
   end
 
@@ -35,10 +35,10 @@ module ElasticsearchHelper
 
   def get_sort_by sort_by
     case sort_by
-    when "lexical"
-      "name.raw"
-    when "recent"
-      "created_at"
+      when "lexical"
+        { "name.raw" => {"order" => "asc" }}
+      when "recent"
+        { "created_at" => {"order" => "desc"}}
     end
   end
 
@@ -105,9 +105,9 @@ module ElasticsearchHelper
     query = {
       query: query_method(text, fields)
     }
-    if sort_by
-      query[:sort] = sort_by
-    end
+
+    query[:sort] = [sort_by,"_score"] if sort_by
+
     query
   end
 
