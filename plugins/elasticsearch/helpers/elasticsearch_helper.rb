@@ -33,6 +33,15 @@ module ElasticsearchHelper
     fields.to_a
   end
 
+  def get_sort_by sort_by
+    case sort_by
+    when "lexical"
+      "name.raw"
+    when "recent"
+      "created_at"
+    end
+  end
+
   def process_results
     selected_type = (params[:selected_type]|| :all).to_sym
     if  selected_type == :all
@@ -43,7 +52,7 @@ module ElasticsearchHelper
   end
 
   def search_from_all_models
-    query = get_query params[:query]
+    query = get_query params[:query], sort_by: get_sort_by(params[:selected_filter_field])
     models = searchable_models
     Elasticsearch::Model.search(query, models, size: default_per_page(params[:per_page])).page(params[:page]).records
   end
@@ -51,7 +60,8 @@ module ElasticsearchHelper
   def search_from_model model
     begin
       klass = model.to_s.classify.constantize
-      query = get_query params[:query], klass
+
+      query = get_query params[:query], klass: klass, sort_by: get_sort_by(params[:selected_filter_field])
       klass.search(query, size: default_per_page(params[:per_page])).page(params[:page]).records
     rescue
       []
@@ -63,7 +73,7 @@ module ElasticsearchHelper
   end
 
   private
-  
+
   def searchable_models
     ElasticsearchHelper::searchable_types.except(:all).keys.map { | model | model.to_s.classify.constantize }
   end
@@ -87,12 +97,17 @@ module ElasticsearchHelper
     query_exp
   end
 
-  def get_query text="", klass=nil
+  def get_query text="", options={}
+    klass = options[:klass]
+    sort_by = options[:sort_by]
+
     fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
     query = {
-      query: query_method(text, fields),
-      sort: "name.raw"
+      query: query_method(text, fields)
     }
+    if sort_by
+      query[:sort] = sort_by
+    end
     query
   end
 

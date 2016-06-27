@@ -5,7 +5,8 @@ class TextArticle
   def self.control_fields
     {
       :advertise => {},
-      :published => {}
+      :published => {},
+      :created_at => {type: 'date'}
     }
   end
   include ElasticsearchIndexedModel

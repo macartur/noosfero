@@ -31,7 +31,6 @@ class ElasticsearchPluginControllerTest < ActionController::TestCase
     assert_not_nil assigns(:searchable_types)
     assert_not_nil assigns(:selected_type)
     assert_not_nil assigns(:search_filter_types)
-    assert_not_nil assigns(:selected_filter_field)
   end
 
   should 'return 10 results if selected_type is nil and query is nil' do
