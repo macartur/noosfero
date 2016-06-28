@@ -2,6 +2,8 @@ module ElasticsearchIndexedModel
 
   def self.included base
     base.send :include, Elasticsearch::Model
+    base.send :include, Elasticsearch::Model::Callbacks
+
     base.send :index_name, "#{Rails.env}_#{base.index_name}"
     base.extend ClassMethods
     base.class_eval do
