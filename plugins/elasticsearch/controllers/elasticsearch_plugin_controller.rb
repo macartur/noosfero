@@ -26,7 +26,8 @@ class ElasticsearchPluginController < ApplicationController
   end
 
   def define_search_fields_types
-    @search_filter_types = ElasticsearchHelper::search_filters
-    @selected_filter_field = (params[:selected_filter_field] || :relevance).to_sym
+    @filter_types = ElasticsearchHelper::filters
+    @selected_filter = (params[:filter] || :relevance).to_sym
   end
+
 end

@@ -11,11 +11,11 @@ module ElasticsearchHelper
     }
   end
 
-  def self.search_filters
+  def self.filters
     {
-     :relevance => { label: _("Relevance")},
-     :lexical   => { label: _("Alphabetical")},
-     :recent    => { label: _("More Recent")},
+     :relevance      => { label: _("Relevance")},
+     :lexical        => { label: _("Alphabetical")},
+     :more_recent    => { label: _("More Recent")},
     }
   end
 
@@ -52,7 +52,7 @@ module ElasticsearchHelper
   end
 
   def search_from_all_models
-    query = get_query params[:query], sort_by: get_sort_by(params[:selected_filter_field])
+    query = get_query params[:query], sort_by: get_sort_by(params[:selected_filter])
     models = searchable_models
     Elasticsearch::Model.search(query, models, size: default_per_page(params[:per_page])).page(params[:page]).records
   end
@@ -61,7 +61,7 @@ module ElasticsearchHelper
     begin
       klass = model.to_s.classify.constantize
 
-      query = get_query params[:query], klass: klass, sort_by: get_sort_by(params[:selected_filter_field])
+      query = get_query params[:query], klass: klass, sort_by: get_sort_by(params[:selected_filter])
       klass.search(query, size: default_per_page(params[:per_page])).page(params[:page]).records
     rescue
       []
