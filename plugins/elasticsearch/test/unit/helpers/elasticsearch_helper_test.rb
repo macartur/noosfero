@@ -42,9 +42,9 @@ class ElasticsearchHelperTest < ActiveSupport::TestCase
     fields = ['name','login']
     result = query_method(query,fields)
 
-    assert_includes result.keys, :multi_match
-    assert_includes result[:multi_match][:query], query
-    assert_equivalent result[:multi_match][:fields], fields
+    assert_includes result.keys, :query_string
+    assert_includes result[:query_string][:query], query
+    assert_equivalent result[:query_string][:fields], fields
   end
 
 

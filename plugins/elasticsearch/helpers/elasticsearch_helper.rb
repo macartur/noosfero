@@ -71,8 +71,8 @@ module ElasticsearchHelper
       }
     else
       query_exp = {
-        multi_match: {
-          query: expression.downcase,
+        query_string: {
+          query: "*"+expression.downcase+"*",
           fields: fields,
           tie_breaker: 0.4,
           minimum_should_match: "40%"
