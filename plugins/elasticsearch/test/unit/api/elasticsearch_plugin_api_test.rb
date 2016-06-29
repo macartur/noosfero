@@ -10,7 +10,7 @@ class ElasticsearchPluginApiTest < ActiveSupport::TestCase
 
   def create_instances
     7.times.each {|index| create_user "person #{index}"}
-    4.times.each {|index| fast_create Community, name: "community #{index}", created_at: Date.new }
+    4.times.each {|index| fast_create Community, name: "community #{index}" }
   end
 
   should 'show all types avaliable in /search/types endpoint' do
@@ -47,5 +47,4 @@ class ElasticsearchPluginApiTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert_equal 4, json["results"].count
   end
-
 end

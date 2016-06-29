@@ -19,42 +19,16 @@ module ElasticsearchHelper
     }
   end
 
-  def fields_from_models klasses
-    fields = Set.new
-    klasses.each do |klass|
-      klass::SEARCHABLE_FIELDS.map do |key, value|
-        if value and value[:weight]
-          fields.add "#{key}^#{value[:weight]}"
-        else
-          fields.add "#{key}"
-        end
-      end
-    end
-    fields.to_a
-  end
-
-  def get_sort_by sort_by
-    case sort_by
-      when "lexical"
-        { "name.raw" => {"order" => "asc" }}
-      when "recent"
-        { "created_at" => {"order" => "desc"}}
-    end
-  end
-
   def process_results
-    selected_type = (params[:selected_type]|| :all).to_sym
-    if  selected_type == :all
-      search_from_all_models
-    else
-      search_from_model selected_type
-    end
+    selected_type = (params[:selected_type].presence|| :all).to_sym
+    selected_type == :all ? search_from_all_models : search_from_model(selected_type)
   end
+
+  private
 
   def search_from_all_models
     query = get_query params[:query], sort_by: get_sort_by(params[:selected_filter])
-    models = searchable_models
-    Elasticsearch::Model.search(query, models, size: default_per_page(params[:per_page])).page(params[:page]).records
+    Elasticsearch::Model.search(query,searchable_models, size: default_per_page(params[:per_page])).page(params[:page]).records
   end
 
   def search_from_model model
@@ -68,17 +42,28 @@ module ElasticsearchHelper
     end
   end
 
-  def default_per_page per_page
+  def default_per_page per_page=nil
     per_page ||= 10
   end
 
-  private
-
-  def searchable_models
-    ElasticsearchHelper::searchable_types.except(:all).keys.map { | model | model.to_s.classify.constantize }
+  def get_sort_by sort_by
+    case sort_by
+      when "lexical"
+        { "name.raw" => {"order" => "asc" }}
+      when "recent"
+        { "created_at" => {"order" => "desc"}}
+    end
   end
 
-  def query_method expression, fields
+  def searchable_models
+    begin
+      ElasticsearchHelper::searchable_types.except(:all).keys.map { | model | model.to_s.classify.constantize }
+    rescue
+      []
+    end
+  end
+
+  def query_method expression="", fields=[]
     query_exp = {}
     if expression.blank?
       query_exp = {
@@ -107,8 +92,21 @@ module ElasticsearchHelper
     }
 
     query[:sort] = [sort_by,"_score"] if sort_by
-
     query
+  end
+
+  def fields_from_models klasses
+    fields = Set.new
+    klasses.each do |klass|
+      klass::SEARCHABLE_FIELDS.map do |key, value|
+        if value and value[:weight]
+          fields.add "#{key}^#{value[:weight]}"
+        else
+          fields.add "#{key}"
+        end
+      end
+    end
+    fields.to_a
   end
 
 end
