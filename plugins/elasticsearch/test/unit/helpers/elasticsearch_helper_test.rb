@@ -14,8 +14,8 @@ class ElasticsearchHelperTest < ActiveSupport::TestCase
 
   def create_instances
     create_user "Jose Abreu"
-    create_user "Joao Abreu"
     create_user "Joana Abreu"
+    create_user "Joao Abreu"
     create_user "Ana Abreu"
   end
 
@@ -32,19 +32,14 @@ class ElasticsearchHelperTest < ActiveSupport::TestCase
     assert_equivalent indexed_models, searchable_models
   end
 
-  should 'return match_all if expression is blank' do
-    assert_includes query_method.keys, :match_all
-  end
-
-  should 'return multi_match if expression is valid' do
+  should 'return query_string if expression is valid' do
 
     query= "my_query"
     fields = ['name','login']
     result = query_method(query,fields)
 
-    assert_includes result.keys, :query_string
-    assert_includes result[:query_string][:query], query
-    assert_equivalent result[:query_string][:fields], fields
+    assert_includes result[:query][:query_string][:query], query
+    assert_equivalent result[:query][:query_string][:fields], fields
   end
 
 
@@ -61,7 +56,8 @@ class ElasticsearchHelperTest < ActiveSupport::TestCase
 
   should 'search from model Person sorted by Alphabetic' do
     self.params= {:selected_type => 'person',
-                  :selected_filter => 'lexical',
+                  :filter => 'lexical',
+                  :query => "Abreu",
                   :per_page => 4}
 
     result = process_results
@@ -70,21 +66,21 @@ class ElasticsearchHelperTest < ActiveSupport::TestCase
 
   should 'search from model Person sorted by More Recent' do
     self.params= {:selected_type => 'person',
-                  :selected_filter => 'more_recent',
+                  :filter => 'more_recent',
+                  :query => 'ABREU',
                   :per_page => 4}
 
     result = process_results
-    assert_equal ["Jose Abreu","Joao Abreu","Joana Abreu","Ana Abreu"],result.map(&:name)
+    assert_equal ["Ana Abreu","Joao Abreu","Joana Abreu","Jose Abreu"], result.map(&:name)
   end
 
   should 'search from model Person sorted by Relevance' do
     self.params= {:selected_type => 'person',
-                  :selected_filter => 'more_recent',
-                  :query => 'JOAO ABREU',
+                  :query => 'JOA BREU',
                   :per_page => 4}
 
     result = process_results
-    assert_equal ["Joao Abreu","Jose Abreu","Joana Abreu","Ana Abreu"],result.map(&:name)
+    assert_equal ["Joana Abreu", "Joao Abreu"], result.map(&:name)
   end
 
 end

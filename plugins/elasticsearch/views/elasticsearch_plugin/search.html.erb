@@ -34,15 +34,14 @@
       <% end %>
     </div>
     <div class="results-count">
-      <% if not @query.blank? %>
-        <p>
-          <strong><%= @results.count %></strong><%= _(" results for ") %><%= @query %>
+      <p>
+        <strong><%= @hits %></strong>
+        <% if not @query.blank? %>
+          <%= _(" results for ") %><%= @query %>
+        <% else %>
+          <%= _(" total results") %>
+        <% end %>
       </p>
-      <% else %>
-        <p>
-        <strong><%= @results.count %></strong><%= _(" total results") %>
-        </p>
-      <% end %>
     </div>
 
 

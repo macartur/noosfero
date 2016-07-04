@@ -18,6 +18,7 @@ class ElasticsearchPluginController < ApplicationController
   def define_results
     @query = params[:query]
     @results = process_results
+    @hits = @results.total
   end
 
   def define_searchable_types

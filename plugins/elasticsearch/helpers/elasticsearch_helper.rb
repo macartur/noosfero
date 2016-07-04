@@ -27,7 +27,7 @@ module ElasticsearchHelper
   private
 
   def search_from_all_models
-    query = get_query params[:query], sort_by: get_sort_by(params[:selected_filter])
+    query = get_query params[:query], sort_by: get_sort_by(params[:filter])
     Elasticsearch::Model.search(query,searchable_models, size: default_per_page(params[:per_page])).page(params[:page]).records
   end
 
@@ -35,7 +35,7 @@ module ElasticsearchHelper
     begin
       klass = model.to_s.classify.constantize
 
-      query = get_query params[:query], klass: klass, sort_by: get_sort_by(params[:selected_filter])
+      query = get_query params[:query], klass: klass, sort_by: get_sort_by(params[:filter])
       klass.search(query, size: default_per_page(params[:per_page])).page(params[:page]).records
     rescue
       []
@@ -50,7 +50,7 @@ module ElasticsearchHelper
     case sort_by
       when "lexical"
         { "name.raw" => {"order" => "asc" }}
-      when "recent"
+      when "more_recent"
         { "created_at" => {"order" => "desc"}}
     end
   end
@@ -66,16 +66,15 @@ module ElasticsearchHelper
   def query_method expression="", fields=[]
     query_exp = {}
     if expression.blank?
-      query_exp = {
-        match_all: {}
-      }
     else
       query_exp = {
-        query_string: {
-          query: "*"+expression.downcase+"*",
-          fields: fields,
-          tie_breaker: 0.4,
-          minimum_should_match: "40%"
+        query: {
+          query_string: {
+            query: "*"+expression.downcase.split.join('* *')+"*",
+            fields: fields,
+            tie_breaker: 0.4,
+            minimum_should_match: "100%"
+          },
         }
       }
     end
@@ -87,11 +86,9 @@ module ElasticsearchHelper
     sort_by = options[:sort_by]
 
     fields = klass.nil? ? (fields_from_models searchable_models) : (fields_from_models [klass])
-    query = {
-      query: query_method(text, fields)
-    }
 
-    query[:sort] = [sort_by,"_score"] if sort_by
+    query = query_method(text, fields)
+    query[:sort] = sort_by if sort_by
     query
   end
 
