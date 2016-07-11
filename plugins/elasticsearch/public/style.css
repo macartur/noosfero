@@ -19,14 +19,22 @@
   width: 500px;
   font-size: 15px;
   height: 30px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #ccc;
+  padding-left: 10px;
 }
 .controller-elasticsearch_plugin .search_form .search_field input[type='submit'] {
   -webkit-appearance: none;
   -moz-appearance: none;
-  height: 36px;
   border: none;
   padding: 0 15px;
-  vertical-align: 2px;
+  line-height: 35px;
+  height: 35px;
+}
+.controller-elasticsearch_plugin .search_form .search_field input[type='submit']:hover {
+  cursor: pointer;
+  background: #ccc;
 }
 
 .controller-elasticsearch_plugin .results {
@@ -42,8 +50,8 @@
   font-size: 18px;
 }
 
-.controller-elasticsearch_plugin .search-filter,
-.controller-elasticsearch_plugin ul.search-options {
+.controller-elasticsearch_plugin #content-inner .search-filter,
+.controller-elasticsearch_plugin #content-inner ul.search-options {
   background: #fff;
   overflow: hidden;
   border-radius: 5px;
@@ -51,7 +59,7 @@
   border: 1px solid #eee;
 }
 
-.controller-elasticsearch_plugin ul {
+.controller-elasticsearch_plugin #content-inner ul {
   background: #FFF;
   list-style: none;
   list-style-position: inside;
@@ -77,11 +85,11 @@
   border-bottom: 1px solid #E1E1E1;
 }
 
-.controller-elasticsearch_plugin  ul li:last-child {
+.controller-elasticsearch_plugin #content-inner ul li:last-child {
   border-bottom: none;
 }
 
-.controller-elasticsearch_plugin ul li a {
+.controller-elasticsearch_plugin #content-inner ul li a {
   text-decoration: none;
   display: block;
   padding: 13px;
